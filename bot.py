@@ -767,6 +767,10 @@ def monitor_open_positions():
                     
                 if not current_price or not entry_price:
                     continue
+                
+                # 🔧 КРИТИЧНО: Оновлюємо позицію поточною ціною для правильного розрахунку PnL
+                position['currentPrice'] = current_price
+                position['markPrice'] = current_price
                     
                 # 1. ПЕРЕВІРКА TAKE PROFIT (З ЛЕВЕРИДЖЕМ!)
                 pnl_pct = calculate_pnl_percentage(position, use_leverage=True)
