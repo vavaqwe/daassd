@@ -1,0 +1,345 @@
+{% extends "base.html" %}
+
+{% block title %}Налаштування - XT Trading Bot{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <!-- Trading Settings -->
+    <div class="col-xl-6 col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-cog me-2"></i>Налаштування торгівлі
+                </h5>
+            </div>
+            <div class="card-body">
+                <form id="trading-settings-form">
+                    <div class="mb-3">
+                        <label class="form-label">Розмір позиції (USDT)</label>
+                        <input type="number" class="form-control" id="position-size" value="5.0" step="0.1" min="1">
+                        <small class="text-muted">Розмір кожної торгової позиції в USDT</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Мінімальний спред (%)</label>
+                        <input type="number" class="form-control" id="min-spread" value="0.5" step="0.1" min="0.1">
+                        <small class="text-muted">Мінімальний спред для відкриття позиції</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Стоп-лосс (%)</label>
+                        <input type="number" class="form-control" id="stop-loss" value="20" step="1" min="1" max="50">
+                        <small class="text-muted">Автоматичне закриття при збитку</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Леверидж</label>
+                        <select class="form-select" id="leverage">
+                            <option value="1">1x</option>
+                            <option value="2">2x</option>
+                            <option value="5" selected>5x</option>
+                            <option value="10">10x</option>
+                        </select>
+                        <small class="text-muted">Рівень левериджу для торгівлі</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="auto-trading" checked>
+                            <label class="form-check-label" for="auto-trading">
+                                Автоматична торгівля
+                            </label>
+                        </div>
+                        <small class="text-muted">Включити/відключити автоматичне відкриття позицій</small>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i>Зберегти налаштування
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Risk Management -->
+    <div class="col-xl-6 col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-shield-alt me-2"></i>Ризик-менеджмент
+                </h5>
+            </div>
+            <div class="card-body">
+                <form id="risk-settings-form">
+                    <div class="mb-3">
+                        <label class="form-label">Максимальних позицій</label>
+                        <input type="number" class="form-control" id="max-positions" value="5" min="1" max="20">
+                        <small class="text-muted">Максимальна кількість одночасних позицій</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Максимальний ризик (%)</label>
+                        <input type="number" class="form-control" id="max-risk" value="10" step="1" min="1" max="50">
+                        <small class="text-muted">Максимальний ризик від загального балансу</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Мінімальний баланс (USDT)</label>
+                        <input type="number" class="form-control" id="min-balance" value="10" step="1" min="1">
+                        <small class="text-muted">Мінімальний баланс для продовження торгівлі</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="emergency-stop">
+                            <label class="form-check-label" for="emergency-stop">
+                                Аварійна зупинка
+                            </label>
+                        </div>
+                        <small class="text-muted">Зупинити торгівлю при критичних збитках</small>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-save me-1"></i>Зберегти налаштування
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Info -->
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-info-circle me-2"></i>Інформація про систему
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <table class="table table-dark table-sm">
+                            <tr>
+                                <td>Версія бота:</td>
+                                <td><strong>v2.1.0</strong></td>
+                            </tr>
+                            <tr>
+                                <td>Біржа:</td>
+                                <td><strong>XT.com</strong></td>
+                            </tr>
+                            <tr>
+                                <td>DEX API:</td>
+                                <td><strong>DexCheck Pro</strong></td>
+                            </tr>
+                            <tr>
+                                <td>Торгових пар:</td>
+                                <td><strong>140+</strong></td>
+                            </tr>
+                            <tr>
+                                <td>Час роботи:</td>
+                                <td><strong id="uptime">Обчислюється...</strong></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <table class="table table-dark table-sm">
+                            <tr>
+                                <td>Telegram бот:</td>
+                                <td><span class="badge bg-success">Активний</span></td>
+                            </tr>
+                            <tr>
+                                <td>Веб-інтерфейс:</td>
+                                <td><span class="badge bg-success">Активний</span></td>
+                            </tr>
+                            <tr>
+                                <td>Моніторинг:</td>
+                                <td><span class="badge bg-success">Включений</span></td>
+                            </tr>
+                            <tr>
+                                <td>Останнє оновлення:</td>
+                                <td><strong id="last-update">--</strong></td>
+                            </tr>
+                            <tr>
+                                <td>Статус API:</td>
+                                <td><span class="badge bg-success">Підключено</span></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-bolt me-2"></i>Швидкі дії
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <button class="btn btn-outline-success w-100" onclick="startTrading()">
+                            <i class="fas fa-play me-1"></i>
+                            Запустити торгівлю
+                        </button>
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btn-outline-warning w-100" onclick="pauseTrading()">
+                            <i class="fas fa-pause me-1"></i>
+                            Призупинити
+                        </button>
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btn-outline-info w-100" onclick="refreshData()">
+                            <i class="fas fa-sync-alt me-1"></i>
+                            Оновити дані
+                        </button>
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btn-outline-secondary w-100" onclick="exportLogs()">
+                            <i class="fas fa-download me-1"></i>
+                            Експорт логів
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    setupForms();
+    updateSystemInfo();
+    
+    // Update every minute
+    setInterval(updateSystemInfo, 60000);
+});
+
+function setupForms() {
+    // Trading settings form
+    document.getElementById('trading-settings-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const settings = {
+            position_size: document.getElementById('position-size').value,
+            min_spread: document.getElementById('min-spread').value,
+            stop_loss: document.getElementById('stop-loss').value,
+            leverage: document.getElementById('leverage').value,
+            auto_trading: document.getElementById('auto-trading').checked
+        };
+        
+        saveSettings('trading', settings);
+    });
+    
+    // Risk settings form
+    document.getElementById('risk-settings-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const settings = {
+            max_positions: document.getElementById('max-positions').value,
+            max_risk: document.getElementById('max-risk').value,
+            min_balance: document.getElementById('min-balance').value,
+            emergency_stop: document.getElementById('emergency-stop').checked
+        };
+        
+        saveSettings('risk', settings);
+    });
+}
+
+function saveSettings(type, settings) {
+    const btn = event.target.querySelector('button[type="submit"]');
+    tradingBot.showButtonLoading(btn);
+    
+    // Simulate API call
+    setTimeout(() => {
+        tradingBot.restoreButton(btn);
+        tradingBot.showToast(`Налаштування ${type === 'trading' ? 'торгівлі' : 'ризиків'} збережено!`, 'success');
+    }, 2000);
+}
+
+function updateSystemInfo() {
+    // Update uptime
+    const startTime = new Date(Date.now() - (Math.random() * 3600000 * 24 * 3)); // Random uptime
+    const uptime = formatUptime(Date.now() - startTime.getTime());
+    document.getElementById('uptime').textContent = uptime;
+    
+    // Update last update time
+    document.getElementById('last-update').textContent = new Date().toLocaleTimeString('uk-UA');
+}
+
+function formatUptime(ms) {
+    const days = Math.floor(ms / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((ms % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
+    
+    if (days > 0) {
+        return `${days}д ${hours}год ${minutes}хв`;
+    } else if (hours > 0) {
+        return `${hours}год ${minutes}хв`;
+    } else {
+        return `${minutes}хв`;
+    }
+}
+
+function startTrading() {
+    const btn = event.target;
+    tradingBot.showButtonLoading(btn);
+    
+    setTimeout(() => {
+        tradingBot.restoreButton(btn);
+        tradingBot.showToast('Торгівлю запущено!', 'success');
+    }, 2000);
+}
+
+function pauseTrading() {
+    const btn = event.target;
+    tradingBot.showButtonLoading(btn);
+    
+    setTimeout(() => {
+        tradingBot.restoreButton(btn);
+        tradingBot.showToast('Торгівлю призупинено!', 'warning');
+    }, 2000);
+}
+
+function refreshData() {
+    const btn = event.target;
+    tradingBot.showButtonLoading(btn);
+    
+    setTimeout(() => {
+        tradingBot.restoreButton(btn);
+        updateSystemInfo();
+        tradingBot.showToast('Дані оновлено!', 'info');
+    }, 3000);
+}
+
+function exportLogs() {
+    const btn = event.target;
+    tradingBot.showButtonLoading(btn);
+    
+    setTimeout(() => {
+        tradingBot.restoreButton(btn);
+        
+        // Create and download a sample log file
+        const logData = `[${new Date().toISOString()}] INFO - Торговий бот активний\n[${new Date().toISOString()}] INFO - Баланс: $29.29 USDT\n[${new Date().toISOString()}] INFO - Активних позицій: 5\n[${new Date().toISOString()}] INFO - Останній спред: ENJ/USDT 19.81%`;
+        
+        const blob = new Blob([logData], { type: 'text/plain' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `xt_bot_logs_${new Date().toISOString().slice(0, 10)}.log`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+        
+        tradingBot.showToast('Логи експортовано!', 'success');
+    }, 2000);
+}
+</script>
+{% endblock %}

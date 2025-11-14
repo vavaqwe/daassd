@@ -1,0 +1,82 @@
+<analysis>
+The trajectory documents the development of Trinkenbot, a sophisticated cryptocurrency arbitrage trading bot, from a standalone Python script to a full-stack web application. The initial task was to integrate the bot's logic into a FastAPI/React framework, connect it to the XT.com exchange using user-provided API keys, and build a Ukrainian-language web interface with analytics.
+
+Development began by migrating the bot's source code and fixing initial dependency issues (missing ). The AI engineer then built a complete React frontend from scratch, including authentication and a dashboard, initially populated with mock data.
+
+User feedback drove the project's evolution significantly. The user requested scanning all 200+ futures pairs on XT, adding configurable leverage/margin, and integrating real-time data from DEXs. This led to a major backend refactoring. The user provided API keys for Ethereum (Infura/Alchemy), BSC (Ankr), and Solana (Ankr), prompting the AI to implement real blockchain integrations using  and  libraries. New modules were created for technical analysis (), real DEX data (), and precise profit calculation ().
+
+The final phase involved implementing advanced logic for automatically closing positions when price spreads converge and debugging a critical runtime issue. The last interaction shows the user reporting an error via a screenshot, which the AI diagnosed as 404 errors from the XT.com API, indicating incorrect API endpoints. The immediate next step is to fix this connectivity issue.
+</analysis>
+
+<product_requirements>
+The objective is to create Trinkenbot, an automated cryptocurrency arbitrage trading bot with a comprehensive web interface.
+
+**Core Functionality:**
+1.  **Arbitrage Trading:** The bot must perform real-time arbitrage by comparing futures prices on the XT.com exchange against token prices on DEXs across Ethereum (Uniswap, SushiSwap), BSC (PancakeSwap), and Solana (Jupiter).
+2.  **Web Dashboard:** A Ukrainian-language React-based UI for monitoring and control. It must display key metrics (balance, P&L, win rate), active positions, arbitrage opportunities, and detailed analytics. Users must be able to start/stop the bot and configure settings.
+3.  **Authentication:** User login is handled via XT.com API keys and a password, not a traditional email/password system.
+
+**Technical & Trading Specifications:**
+*   **Exchange:** Full integration with XT.com futures, scanning all available pairs (~380) except BTC, ETH, SOL, and LTC.
+*   **DEX Integration:** Must use provided API keys/endpoints (Infura, Alchemy, Ankr) to fetch real-time price, liquidity, and volume data.
+*   **Technical Analysis:** Incorporate indicators like RSI, MACD, Bollinger Bands, VWAP, and ATR for signal validation.
+*   **Configuration:** The UI must allow users to set leverage, margin, and risk parameters (e.g., stop-loss at -25% P&L).
+*   **Position Management:** The bot must automatically open positions on profitable spreads and, crucially, close them automatically when the prices between XT.com and the DEX converge to secure the profit.
+</product_requirements>
+
+<key_technical_concepts>
+- **Backend:** FastAPI
+- **Frontend:** React
+- **Database:** MongoDB
+- **CEX Integration:**  library and direct REST API calls for XT.com.
+- **DEX Integration:**  for Ethereum/BSC and  for Solana blockchain interaction.
+- **Technical Analysis:**  for calculating indicators (RSI, MACD, Bollinger Bands).
+- **Core Logic:** Cross-exchange arbitrage, real-time data fetching, and automated trade execution.
+- **Authentication:** Custom scheme based on third-party (XT.com) API keys.
+</key_technical_concepts>
+
+<code_architecture>
+The application is a monorepo with distinct backend and frontend services. The backend houses the trading logic and serves a REST API, while the frontend provides the user interface.
+
+**Directory Structure:**
+
+
+-   **/app/backend/server.py**
+    -   **Importance:** The main FastAPI application file. It defines all API endpoints for the frontend, manages application lifecycle events (startup/shutdown), and initializes the trading bot instance.
+    -   **Changes:** Heavily modified to add numerous endpoints for dashboard data, analytics, technical indicators, bot status, position management, and settings configuration.
+
+-   **/app/backend/trading_bot.py**
+    -   **Importance:** Contains the core arbitrage logic. It runs the main scanning loop, compares prices, identifies opportunities, manages positions, and integrates data from both the CEX and DEX clients.
+    -   **Changes:** Evolved from a simple script to a complex module. Logic was added to scan over 380 pairs, calculate profit accurately using the , and implement the crucial feature of closing positions upon price convergence.
+
+-   **/app/backend/xt_client.py**
+    -   **Importance:** A dedicated client for all interactions with the XT.com exchange API, handling authentication, fetching market data, placing orders, and managing positions.
+    -   **Changes:** Completely rewritten to add more robust methods for fetching all futures pairs, managing leverage/margin, and handling API errors.
+
+-   **/app/backend/real_dex_client.py**
+    -   **Importance:** A new module created to handle all real-time data fetching from Ethereum, BSC, and Solana blockchains using Web3 and Solana libraries.
+    -   **Changes:** Created from scratch to implement functions like , , and , using the API keys provided by the user.
+
+-   **/app/backend/technical_indicators.py** & **/app/backend/profit_calculator.py**
+    -   **Importance:** New modules to separate complex calculations.  uses TA-Lib to generate market signals, while  provides precise P&L estimates by factoring in fees and slippage.
+    -   **Changes:** Created from scratch to support advanced trading logic.
+
+-   **/app/frontend/src/components/Dashboard.js**
+    -   **Importance:** The main UI component for the trading bot. It displays all data from the backend and allows the user to interact with the bot.
+    -   **Changes:** Created from scratch and subsequently updated to remove mock data, add tabs for different analytics, and include controls for leverage and margin settings.
+</code_architecture>
+
+<pending_tasks>
+- Fix the critical issue where the XT.com API is returning 404 Not Found errors. This is preventing the bot from fetching any market data from the exchange and is a complete blocker for its operation.
+- Verify that after the fix, the bot can successfully fetch the list of ~380 futures pairs and their real-time prices.
+</pending_tasks>
+
+<current_work>
+The AI engineer was actively debugging a critical failure in the application. The user reported an issue with a screenshot, showing a network error on the frontend. After investigating the service logs, the engineer found that the backend was unable to communicate with the XT.com exchange. Specifically, API calls intended to fetch market data (like the list of futures pairs) were failing with 404 Not Found errors.
+
+This indicates that the API endpoints hardcoded or configured in  are incorrect, likely due to an API update by the exchange or a misconfiguration between sandbox and production URLs. The AI correctly diagnosed this as the root cause of the UI error and the bot's inability to function. The work was paused immediately after this diagnosis, with the clear next step being to correct these invalid API endpoints. The application is currently in a non-functional state for real trading because its primary data source connection is broken.
+</current_work>
+
+<optional_next_step>
+Investigate the correct production API endpoints for the XT.com futures market and update the  file to fix the 404 errors.
+</optional_next_step>

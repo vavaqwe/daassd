@@ -1,0 +1,415 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - XT Trading Bot{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <!-- Status Overview -->
+    <div class="col-12">
+        <div class="row g-3">
+            <div class="col-md-3 col-sm-6">
+                <div class="card status-card h-100">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">
+                            <i class="fas fa-robot text-primary fs-1 mb-2"></i>
+                        </h5>
+                        <h6 class="text-muted mb-0">Статус бота</h6>
+                        <h4 class="text-primary mb-0" id="bot-status">АКТИВНИЙ</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <div class="card profit-card h-100">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">
+                            <i class="fas fa-wallet text-success fs-1 mb-2"></i>
+                        </h5>
+                        <h6 class="text-muted mb-0">Загальний баланс</h6>
+                        <h4 class="text-success mb-0" id="total-balance">$0.00</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <div class="card status-card h-100">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">
+                            <i class="fas fa-coins text-warning fs-1 mb-2"></i>
+                        </h5>
+                        <h6 class="text-muted mb-0">Доступно</h6>
+                        <h4 class="text-warning mb-0" id="available-balance">$0.00</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+                <div class="card loss-card h-100">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">
+                            <i class="fas fa-chart-line text-info fs-1 mb-2"></i>
+                        </h5>
+                        <h6 class="text-muted mb-0">Активних позицій</h6>
+                        <h4 class="text-info mb-0" id="active-positions">0</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Trading Statistics -->
+    <div class="col-xl-8 col-lg-7">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="fas fa-chart-bar me-2"></i>Статистика торгів (24г)
+                </h5>
+                <small class="text-muted" id="last-update">Оновлено: --</small>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="tradingChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Signals -->
+    <div class="col-xl-4 col-lg-5">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-signal me-2"></i>Останні сигнали
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush" id="recent-signals">
+                    <div class="list-group-item bg-dark text-center py-4">
+                        <i class="fas fa-spinner fa-spin text-primary"></i>
+                        <p class="mt-2 mb-0 text-muted">Завантаження...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Current Positions -->
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="fas fa-list me-2"></i>Поточні позиції
+                </h5>
+                <button class="btn btn-sm btn-outline-primary" onclick="refreshPositions()">
+                    <i class="fas fa-sync-alt me-1"></i>Оновити
+                </button>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-dark table-hover">
+                        <thead>
+                            <tr>
+                                <th>Пара</th>
+                                <th>Тип</th>
+                                <th>Розмір</th>
+                                <th>Ціна входу</th>
+                                <th>Поточна ціна</th>
+                                <th>P&L</th>
+                                <th>P&L %</th>
+                                <th>Статус</th>
+                            </tr>
+                        </thead>
+                        <tbody id="positions-table">
+                            <tr>
+                                <td colspan="8" class="text-center py-4">
+                                    <i class="fas fa-spinner fa-spin text-primary me-2"></i>
+                                    Завантаження позицій...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Performance Metrics -->
+    <div class="col-xl-6 col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-trophy me-2"></i>Показники ефективності
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-6">
+                        <div class="text-center">
+                            <h3 class="text-success" id="win-rate">0%</h3>
+                            <small class="text-muted">Відсоток успішних</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="text-center">
+                            <h3 class="text-info" id="total-trades">0</h3>
+                            <small class="text-muted">Всього угод</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="text-center">
+                            <h3 class="text-success" id="total-profit">$0.00</h3>
+                            <small class="text-muted">Загальний прибуток</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="text-center">
+                            <h3 class="text-primary" id="avg-profit">$0.00</h3>
+                            <small class="text-muted">Середній прибуток</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Status -->
+    <div class="col-xl-6 col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-server me-2"></i>Статус системи
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span>Торговий бот</span>
+                            <span class="badge bg-success" id="trading-bot-status">Активний</span>
+                        </div>
+                        <div class="progress mb-3">
+                            <div class="progress-bar" role="progressbar" style="width: 100%"></div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span>Telegram бот</span>
+                            <span class="badge bg-success" id="telegram-bot-status">Активний</span>
+                        </div>
+                        <div class="progress mb-3">
+                            <div class="progress-bar" role="progressbar" style="width: 100%"></div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span>DexCheck API</span>
+                            <span class="badge bg-success" id="dex-api-status">Підключено</span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar" role="progressbar" style="width: 100%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Initialize Chart
+let tradingChart;
+
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    initializeTradingChart();
+    loadDashboardData();
+    
+    // Auto-refresh every 30 seconds
+    setInterval(loadDashboardData, 30000);
+});
+
+function initializeTradingChart() {
+    const ctx = document.getElementById('tradingChart').getContext('2d');
+    tradingChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'Прибуток/Збиток ($)',
+                data: [],
+                borderColor: '#00d4aa',
+                backgroundColor: 'rgba(0, 212, 170, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: {
+                        color: '#e8e8e8'
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    ticks: {
+                        color: '#e8e8e8'
+                    },
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    }
+                },
+                y: {
+                    ticks: {
+                        color: '#e8e8e8',
+                        callback: function(value) {
+                            return '$' + value.toFixed(2);
+                        }
+                    },
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    }
+                }
+            }
+        }
+    });
+}
+
+function loadDashboardData() {
+    fetch('/api/dashboard-data')
+        .then(response => response.json())
+        .then(data => {
+            updateDashboard(data);
+        })
+        .catch(error => {
+            console.error('Error loading dashboard data:', error);
+        });
+}
+
+function updateDashboard(data) {
+    // Update balance info
+    document.getElementById('total-balance').textContent = '$' + (data.balance?.total || 0).toFixed(2);
+    document.getElementById('available-balance').textContent = '$' + (data.balance?.available || 0).toFixed(2);
+    document.getElementById('active-positions').textContent = data.positions?.length || 0;
+    
+    // Update last update time
+    document.getElementById('last-update').textContent = 'Оновлено: ' + new Date().toLocaleTimeString('uk-UA');
+    
+    // Update positions table
+    updatePositionsTable(data.positions || []);
+    
+    // Update recent signals
+    updateRecentSignals(data.recent_signals || []);
+    
+    // Update performance metrics
+    updatePerformanceMetrics(data.performance || {});
+    
+    // Update chart
+    updateTradingChart(data.chart_data || []);
+}
+
+function updatePositionsTable(positions) {
+    const tbody = document.getElementById('positions-table');
+    
+    if (positions.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="8" class="text-center py-4 text-muted">
+                    <i class="fas fa-inbox me-2"></i>
+                    Немає активних позицій
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    tbody.innerHTML = positions.map(pos => `
+        <tr>
+            <td><strong>${pos.symbol}</strong></td>
+            <td>
+                <span class="badge ${pos.side === 'LONG' ? 'bg-success' : 'bg-danger'}">
+                    ${pos.side}
+                </span>
+            </td>
+            <td>${pos.size}</td>
+            <td>$${parseFloat(pos.entry_price || 0).toFixed(4)}</td>
+            <td>$${parseFloat(pos.current_price || 0).toFixed(4)}</td>
+            <td class="${parseFloat(pos.pnl || 0) >= 0 ? 'text-success' : 'text-danger'}">
+                $${parseFloat(pos.pnl || 0).toFixed(2)}
+            </td>
+            <td class="${parseFloat(pos.pnl_percent || 0) >= 0 ? 'text-success' : 'text-danger'}">
+                ${parseFloat(pos.pnl_percent || 0).toFixed(2)}%
+            </td>
+            <td>
+                <span class="badge ${pos.status === 'OPEN' ? 'bg-primary' : 'bg-secondary'}">
+                    ${pos.status || 'OPEN'}
+                </span>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function updateRecentSignals(signals) {
+    const container = document.getElementById('recent-signals');
+    
+    if (signals.length === 0) {
+        container.innerHTML = `
+            <div class="list-group-item bg-dark text-center py-4">
+                <i class="fas fa-chart-line text-muted me-2"></i>
+                <p class="mt-2 mb-0 text-muted">Немає сигналів</p>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = signals.slice(0, 5).map(signal => `
+        <div class="list-group-item bg-dark border-0">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <strong class="text-primary">${signal.symbol}</strong>
+                    <small class="text-muted d-block">${signal.time}</small>
+                </div>
+                <div class="text-end">
+                    <span class="badge ${signal.type === 'BUY' ? 'bg-success' : 'bg-danger'}">
+                        ${signal.type}
+                    </span>
+                    <div class="text-${signal.spread > 0 ? 'success' : 'danger'} fw-bold">
+                        ${signal.spread > 0 ? '+' : ''}${signal.spread.toFixed(2)}%
+                    </div>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function updatePerformanceMetrics(performance) {
+    document.getElementById('win-rate').textContent = (performance.win_rate || 0).toFixed(1) + '%';
+    document.getElementById('total-trades').textContent = performance.total_trades || 0;
+    document.getElementById('total-profit').textContent = '$' + (performance.total_profit || 0).toFixed(2);
+    document.getElementById('avg-profit').textContent = '$' + (performance.avg_profit || 0).toFixed(2);
+}
+
+function updateTradingChart(chartData) {
+    if (chartData.length > 0) {
+        tradingChart.data.labels = chartData.map(point => point.time);
+        tradingChart.data.datasets[0].data = chartData.map(point => point.profit);
+        tradingChart.update();
+    }
+}
+
+function refreshPositions() {
+    const btn = event.target.closest('button');
+    const originalHtml = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Оновлення...';
+    btn.disabled = true;
+    
+    setTimeout(() => {
+        loadDashboardData();
+        btn.innerHTML = originalHtml;
+        btn.disabled = false;
+    }, 2000);
+}
+</script>
+{% endblock %}

@@ -1,0 +1,188 @@
+/* Custom Dark Theme for Trading Bot */
+:root {
+    --primary: #00d4aa;
+    --secondary: #1a1a2e;
+    --success: #00e676;
+    --danger: #ff5252;
+    --warning: #ffc107;
+    --info: #2196f3;
+    --dark: #0f0f23;
+    --light: #e8e8e8;
+}
+
+body {
+    background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%);
+    min-height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Navigation */
+.bg-gradient-primary {
+    background: linear-gradient(90deg, var(--primary) 0%, #00a693 100%) !important;
+}
+
+/* Cards */
+.card {
+    background: rgba(26, 26, 46, 0.9);
+    border: 1px solid rgba(0, 212, 170, 0.2);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    backdrop-filter: blur(4px);
+    border-radius: 15px;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px 0 rgba(0, 212, 170, 0.3);
+    transition: all 0.3s ease;
+}
+
+/* Status Cards */
+.status-card {
+    background: linear-gradient(135deg, rgba(0, 212, 170, 0.1) 0%, rgba(26, 26, 46, 0.9) 100%);
+    border-left: 4px solid var(--primary);
+}
+
+.profit-card {
+    background: linear-gradient(135deg, rgba(0, 230, 118, 0.1) 0%, rgba(26, 26, 46, 0.9) 100%);
+    border-left: 4px solid var(--success);
+}
+
+.loss-card {
+    background: linear-gradient(135deg, rgba(255, 82, 82, 0.1) 0%, rgba(26, 26, 46, 0.9) 100%);
+    border-left: 4px solid var(--danger);
+}
+
+/* Tables */
+.table-dark {
+    background-color: rgba(26, 26, 46, 0.9);
+}
+
+.table-dark td {
+    border-color: rgba(0, 212, 170, 0.2);
+}
+
+/* Badges */
+.badge {
+    font-size: 0.8em;
+    padding: 0.5em 0.75em;
+}
+
+.badge-profit {
+    background-color: var(--success);
+    color: white;
+}
+
+.badge-loss {
+    background-color: var(--danger);
+    color: white;
+}
+
+.badge-pending {
+    background-color: var(--warning);
+    color: black;
+}
+
+/* Pulse animation */
+.pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: .5;
+    }
+}
+
+/* Progress bars */
+.progress {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.progress-bar {
+    background: linear-gradient(90deg, var(--primary), var(--success));
+}
+
+/* Buttons */
+.btn-primary {
+    background: linear-gradient(90deg, var(--primary), #00a693);
+    border: none;
+    border-radius: 10px;
+    padding: 0.5rem 1.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(90deg, #00a693, var(--primary));
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(0, 212, 170, 0.4);
+}
+
+/* Forms */
+.form-control {
+    background: rgba(26, 26, 46, 0.9);
+    border: 1px solid rgba(0, 212, 170, 0.3);
+    color: white;
+    border-radius: 10px;
+}
+
+.form-control:focus {
+    background: rgba(26, 26, 46, 0.9);
+    border-color: var(--primary);
+    color: white;
+    box-shadow: 0 0 0 0.2rem rgba(0, 212, 170, 0.25);
+}
+
+/* Charts */
+.chart-container {
+    position: relative;
+    height: 300px;
+    margin: 20px 0;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #1a1a2e;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #00a693;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .container-fluid {
+        padding: 0.5rem;
+    }
+    
+    .card {
+        margin-bottom: 1rem;
+    }
+    
+    .table-responsive {
+        font-size: 0.9rem;
+    }
+}
+
+/* Loading spinner */
+.spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+}
+
+.loading {
+    opacity: 0.7;
+    pointer-events: none;
+}
