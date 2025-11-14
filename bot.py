@@ -721,6 +721,27 @@ def monitor_open_positions():
                 if position.get('status') == 'closing':
                     continue
                 
+                # 🔧 КРИТИЧНО: СПОЧАТКУ отримуємо поточну ціну для ВСІХ перевірок PnL
+                exchange = position.get('exchange', 'gate')
+                entry_price = position.get('avg_entry', 0)
+                
+                # Отримуємо поточну ціну з правильної біржі
+                current_price = None
+                if exchange == "gate":
+                    ticker = fetch_xt_ticker(xt, symbol)
+                    current_price = float(ticker['last']) if ticker else None
+                elif exchange == "xt" and xt:
+                    ticker = xt_client.fetch_xt_ticker(xt, symbol)
+                    current_price = float(ticker['last']) if ticker else None
+                    
+                if not current_price or not entry_price:
+                    logging.warning(f"⚠️ [{symbol}] Пропускаємо: current_price={current_price}, entry_price={entry_price}")
+                    continue
+                
+                # 🔧 КРИТИЧНО: Оновлюємо позицію поточною ціною для правильного розрахунку PnL
+                position['currentPrice'] = current_price
+                position['markPrice'] = current_price
+                
                 # ⏰ 1. ПЕРЕВІРКА 1-ГОДИННОГО ТАЙМЕРА (НАЙВИЩА ПРІОРИТЕТНІСТЬ)
                 if ENABLE_TIME_STOP:
                     expires_at = position.get('expires_at', 0)
@@ -752,25 +773,7 @@ def monitor_open_positions():
                 if time.time() - entry_time < MIN_HOLD_SEC:
                     continue
                     
-                exchange = position.get('exchange', 'gate')
                 side = position.get('side', 'LONG').upper()  # 🔒 КРИТИЧНО: нормалізуємо до uppercase
-                entry_price = position.get('avg_entry', 0)
-                
-                # Отримуємо поточну ціну з правильної біржі
-                current_price = None
-                if exchange == "gate":
-                    ticker = fetch_xt_ticker(xt, symbol)
-                    current_price = float(ticker['last']) if ticker else None
-                elif exchange == "xt" and xt:
-                    ticker = xt_client.fetch_xt_ticker(xt, symbol)
-                    current_price = float(ticker['last']) if ticker else None
-                    
-                if not current_price or not entry_price:
-                    continue
-                
-                # 🔧 КРИТИЧНО: Оновлюємо позицію поточною ціною для правильного розрахунку PnL
-                position['currentPrice'] = current_price
-                position['markPrice'] = current_price
                     
                 # 1. ПЕРЕВІРКА TAKE PROFIT (З ЛЕВЕРИДЖЕМ!)
                 pnl_pct = calculate_pnl_percentage(position, use_leverage=True)
