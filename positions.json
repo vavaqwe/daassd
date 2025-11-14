@@ -1,42 +1,5 @@
 {
-  "positions": {
-    "AVA/USDT:USDT": {
-      "side": "SHORT",
-      "avg_entry": 0.3483,
-      "size_usdt": 5.0,
-      "adds_done": 0,
-      "last_add_price": 0.3483,
-      "tp_price": 0.33337285714285714,
-      "last_add_time": 1763137519.9203992,
-      "exchange": "xt",
-      "entry_time": 1763137519.9203994,
-      "arb_pair": "xt-dex",
-      "entry_spread_pct": -2.5313150926743218,
-      "entry_ref_price": 0.3399,
-      "status": "open",
-      "opened_at": 1763137519.9204044,
-      "expires_at": 1763141119.9204044,
-      "xt_pair_url": "https://www.xt.com/en/trade/futures_AVAUSDT"
-    },
-    "SWELL/USDT:USDT": {
-      "side": "SHORT",
-      "avg_entry": 0.003184,
-      "size_usdt": 5.0,
-      "adds_done": 0,
-      "last_add_price": 0.003184,
-      "tp_price": 0.0030475428571428574,
-      "last_add_time": 1763137526.3315706,
-      "exchange": "xt",
-      "entry_time": 1763137526.331571,
-      "arb_pair": "xt-dex",
-      "entry_spread_pct": -2.5382748632121097,
-      "entry_ref_price": 0.003107,
-      "status": "open",
-      "opened_at": 1763137526.3315747,
-      "expires_at": 1763141126.3315747,
-      "xt_pair_url": "https://www.xt.com/en/trade/futures_SWELLUSDT"
-    }
-  },
-  "saved_at": 1763137526.3315938,
+  "positions": {},
+  "saved_at": 1763141556.249839,
   "version": "1.1"
 }
