@@ -109,6 +109,9 @@ def check_and_update_blacklist(symbol, pnl_pct):
     Перевіряє, чи був це Stop Loss, і оновлює лічильник.
     Якщо 3 збитки підряд — додає в бан.
     """
+    # Флаг для відправки повідомлення ЗА МЕЖАМИ локу
+    should_send_blacklist_alert = False
+    
     # Якщо збиток більший або рівний нашому STOP_LOSS_PCT (наприклад, -3%)
     # pnl_pct буде від'ємним числом, тому порівнюємо: -3.5 <= -3.0
     if pnl_pct <= -STOP_LOSS_PCT:
@@ -123,9 +126,13 @@ def check_and_update_blacklist(symbol, pnl_pct):
                 if symbol not in blacklist_data["banned_symbols"]:
                     blacklist_data["banned_symbols"].append(symbol)
                     logging.warning(f"⛔ [{symbol}] ДОДАНО В ЧОРНИЙ СПИСОК (3 stop-loss)")
-                    send_to_admins_and_group(f"⛔ **BLACKLIST ALERT**\nMoneta **{symbol}** отримала 3 стоп-лосси і заблокована для торгівлі.")
+                    should_send_blacklist_alert = True  # 🔧 ФІКС: Встановлюємо флаг замість відправки
             
             save_blacklist()
+        
+        # 🔧 КРИТИЧНИЙ ФІКС: Відправляємо Telegram ЗА МЕЖАМИ локу
+        if should_send_blacklist_alert:
+            send_to_admins_and_group(f"⛔ **BLACKLIST ALERT**\nMoneta **{symbol}** отримала 3 стоп-лосси і заблокована для торгівлі.")
     
     # (Опціонально) Якщо отримали Тейк-Профіт, можна скидати лічильник невдач:
     elif pnl_pct >= TAKE_PROFIT_PCT:
