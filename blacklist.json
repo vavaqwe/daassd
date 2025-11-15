@@ -1,4 +1,6 @@
 {
     "banned_symbols": [],
-    "loss_counts": {}
+    "loss_counts": {
+        "LQTY/USDT:USDT": 0
+    }
 }
