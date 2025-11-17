@@ -106,34 +106,34 @@ def save_blacklist():
 
 def check_and_update_blacklist(symbol, pnl_pct):
     """
-    Перевіряє, чи був це Stop Loss, і оновлює лічильник.
+    Перевіряє, чи була угода збитковою, і оновлює лічильник.
     Якщо 3 збитки підряд — додає в бан.
     """
-    # Якщо збиток більший або рівний нашому STOP_LOSS_PCT (наприклад, -3%)
-    # pnl_pct буде від'ємним числом, тому порівнюємо: -3.5 <= -3.0
-    if pnl_pct <= -STOP_LOSS_PCT:
+    
+    if pnl_pct < 0:
         with blacklist_lock:
             # Отримуємо поточну кількість збитків
             current_losses = blacklist_data["loss_counts"].get(symbol, 0) + 1
             blacklist_data["loss_counts"][symbol] = current_losses
             
-            logging.warning(f"⚠️ [{symbol}] STOP LOSS #{current_losses}! (Поріг: 3)")
+            logging.warning(f"⚠️ [{symbol}] ЗАФІКСОВАНО ЗБИТОК #{current_losses}! (PnL: {pnl_pct:.2f}%) (Поріг: 3)")
 
             if current_losses >= 3:
                 if symbol not in blacklist_data["banned_symbols"]:
                     blacklist_data["banned_symbols"].append(symbol)
-                    logging.warning(f"⛔ [{symbol}] ДОДАНО В ЧОРНИЙ СПИСОК (3 stop-loss)")
-                    send_to_admins_and_group(f"⛔ **BLACKLIST ALERT**\nMoneta **{symbol}** отримала 3 стоп-лосси і заблокована для торгівлі.")
+                    logging.warning(f"⛔ [{symbol}] ДОДАНО В ЧОРНИЙ СПИСОК (3 збитки)")
+                    send_to_admins_and_group(f"⛔ **BLACKLIST ALERT**\nМонета **{symbol}** отримала 3 збитки і заблокована для торгівлі.")
             
             save_blacklist()
     
-    # (Опціонально) Якщо отримали Тейк-Профіт, можна скидати лічильник невдач:
-    elif pnl_pct >= TAKE_PROFIT_PCT:
+    elif pnl_pct > 0:
         with blacklist_lock:
+            # Перевіряємо, чи є що скидати (економія запису в файл)
             if symbol in blacklist_data["loss_counts"] and blacklist_data["loss_counts"][symbol] > 0:
                 blacklist_data["loss_counts"][symbol] = 0
                 save_blacklist()
-                logging.info(f"♻️ [{symbol}] Лічильник збитків скинуто після успішного TP")
+                logging.info(f"♻️ [{symbol}] Лічильник збитків скинуто після прибуткової угоди (PnL: {pnl_pct:.2f}%)")
+    
 # ------------------------------------------------------
 
 # 💾 ФУНКЦІЇ ЗБЕРЕЖЕННЯ/ЗАВАНТАЖЕННЯ ПОЗИЦІЙ
@@ -2164,6 +2164,9 @@ def symbol_worker(symbol):
                         with active_positions_lock:
                             if symbol in active_positions:
                                 del active_positions[symbol]
+                        
+                        # 🔥 ДОДАНО: Оновлюємо чорний список
+                        check_and_update_blacklist(symbol, pnl_pct)
                         
                         # ДОДАЄМО ДО ІСТОРІЇ ТОРГІВЛІ
                         try:
